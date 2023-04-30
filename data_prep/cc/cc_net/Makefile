@@ -8,7 +8,7 @@ servers?=0
 
 # List of languages for LM.
 langs?=af,ar,az,be,bg,bn,ca,cs,da,de,el,en,es,et,fa,fi,fr,gu,he,hi,hr,hu,hy,id,\
-is,it,ja,ka,kk,km,kn,ko,lt,lv,mk,ml,mn,mr,my,ne,nl,no,pl,pt,ro,ru,uk,zh
+is,it,ja,ka,kk,km,kn,ko,lt,lv,mk,ml,mn,mr,my,ne,nl,no,pl,pt,ro,ru,uk,zh,th
 
 # Experiment config
 NDOC_FOR_LM=1_000_000
@@ -114,17 +114,17 @@ data/cirrus/sp/%.opening.txt: data/cirrus/gz/%.json.gz data/lm_sp/%.sp.model
 	$(SPM_ENCODE) \
 		--model=$(word 2,$^) \
 		--output_format=piece \
-			< <(python get_wiki_cirrus.py opening --file $< --n_docs $(NDOC_FOR_LM)) \
+			< <(python cc_net/get_wiki_cirrus.py opening --file $< --n_docs $(NDOC_FOR_LM)) \
 			> $@
 
 data/cirrus/txt/%.opening.txt: data/cirrus/gz/%.json.gz
-	python get_wiki_cirrus.py opening \
+	python cc_net/get_wiki_cirrus.py opening \
 		--n_docs $(NDOC_FOR_LM) \
 		--file $< --output $@
 
 data/cirrus/gz/%.json.gz:
 	mkdir $(@D)
-	python get_wiki_cirrus.py dl --lang $(call get_lang,$(@F)) --output_dir $(@D)
+	python cc_net/get_wiki_cirrus.py dl --lang $(call get_lang,$(@F)) --output_dir $(@D)
 
 clean:
 	# Remove intemediary files, dataset, third_party sources
@@ -233,4 +233,3 @@ test_with_metadata: test_data/regroup_tr/$(_SEGMENT).json.gz
 		<(zcat test_data/mined/2019-09/*.json.gz | jq -r .url | sort) \
 		<(zcat test_data/reproduce/2019-09/*.json.gz | jq -r .url | sort) \
 		| head
-
